@@ -1,0 +1,26 @@
+# Environment / secrets
+.env
+
+# Virtual environments
+.venv/
+venv/
+
+# Large model files
+*.onnx
+piper/
+
+# Wake word model
+*.ppn
+
+# Vector database
+vanagon_local_db/
+
+# Audio recordings
+*.wav
+
+# Python cache
+__pycache__/
+*.pyc
+
+# IDE
+.idea/
