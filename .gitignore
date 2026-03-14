@@ -1,13 +1,9 @@
-# Environment / secrets
-.env
-
-# Virtual environments
 .venv/
-venv/
-
-# Large model files
-*.onnx
-piper/
+__pycache__/
+*.ppn
+service_history.txt
+gunter_temp.wav
+.idea/
 
 # Wake word model
 *.ppn
