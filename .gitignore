@@ -1,22 +1,40 @@
-.venv/
-__pycache__/
-*.ppn
+# ── Personal data — never commit these ───────────────────────────────────────
+.env
+providers.json
+vanagon_config.json
+service_records.json
 service_history.txt
-gunter_temp.wav
-.idea/
 
-# Wake word model
-*.ppn
-
-# Vector database
-vanagon_local_db/
-
-# Audio recordings
-*.wav
-
-# Python cache
+# ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+.Python
 
-# IDE
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Runtime audio temp files ──────────────────────────────────────────────────
+gunter_temp.wav
+/tmp/gunter_tts.wav
+
+# ── ChromaDB vectorstore — too large for GitHub (use Git LFS or rebuild) ─────
+vanagon_local_db/
+vanagon_local_db_old/
+
+# ── Manuals — copyright protected PDFs ───────────────────────────────────────
+Manuals/
+
+# ── OS / editor artifacts ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
 .idea/
+.vscode/
+samba_full_content.md
+voices/
+wake_word/
