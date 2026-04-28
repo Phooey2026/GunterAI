@@ -68,7 +68,7 @@ Built with Python, LangChain, ChromaDB, Piper TTS, and your choice of AI provide
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/yourusername/GunterAI.git
+git clone https://github.com/Phooey2026/GunterAI.git
 cd GunterAI
 ```
 
