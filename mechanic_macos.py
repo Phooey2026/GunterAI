@@ -375,6 +375,9 @@ def play_ready_sound():
 
 def speak(text):
     """Piper TTS → /tmp/gunter_tts.wav → afplay (replaces paplay on macOS)."""
+    if not text or not text.strip():
+        print("Gunter: [no audio — empty response]")
+        return
     import re as _re
     text = _re.sub(r'\*\*(.+?)\*\*', r'\1', text)
     text = _re.sub(r'\*(.+?)\*',     r'\1', text)
@@ -409,13 +412,19 @@ def speak(text):
     safe_text    = shlex.quote(text)
     speaker_flag = f"--speaker {speaker_id} " if speaker_id is not None else ""
 
-    # macOS: afplay replaces paplay
+    speaker_arg = f"--speaker {speaker_id} " if speaker_id is not None else ""
     command = (f'echo {safe_text} | {piper_cmd} --model {model_path} '
-               f'{speaker_flag}--output_file /tmp/gunter_tts.wav && '
+               f'{speaker_arg}--output-file /tmp/gunter_tts.wav && '
                f'afplay /tmp/gunter_tts.wav')
-    print(f"Gunter: {text}")
-    subprocess.run(command, shell=True)
 
+    print(f"Gunter: {text}")
+    tmp_txt = "/tmp/gunter_input.txt"
+    with open(tmp_txt, "w") as f:
+        f.write(text)
+    command = (f'{piper_cmd} --model {model_path} '
+               f'{speaker_flag}--output-file /tmp/gunter_tts.wav '
+               f'< {tmp_txt} && afplay /tmp/gunter_tts.wav')
+    subprocess.run(command, shell=True)
 
 # ── Manual display — macOS PDF viewer ────────────────────────────────────────
 def _open_manual_to_page(page_num, source="bentley"):
@@ -690,7 +699,7 @@ GUNTER:"""
         "prompt": full_prompt,
         "stream": False,
         "options": {
-            "num_predict": 300,
+            "num_predict": 1000,
             "num_ctx":     16384,
             "temperature": 0.2
         }
@@ -698,10 +707,12 @@ GUNTER:"""
     try:
         response = requests.post(
             "http://localhost:11434/api/generate",
-            json=payload, timeout=600
+            json=payload, timeout=300
         )
-        return response.json().get(
-            "response", "The Bentley is greasy and I cannot read it.")
+        result = response.json()
+        print(
+            f"DEBUG _ask_llama: model={active_model} done={result.get('done')} done_reason={result.get('done_reason')} response_len={len(result.get('response', ''))}")
+        return result.get("response", "The Bentley is greasy and I cannot read it.")
     except Exception as e:
         return f"Ach! My brain is stalled: {e}"
 
@@ -827,10 +838,13 @@ def ask_gunter(question, history=None, van_config=None):
     name     = provider.get("name", "anthropic")
     api_key  = provider.get("api_key", "").strip()
     model    = provider.get("model", "")
-
+    print(f"DEBUG ask_gunter: name={name} api_key='{api_key}' model={model}")
+    print(f"DEBUG LLM_MODE={LLM_MODE}")
     if not api_key:
         if LLM_MODE == "claude":
             return _ask_claude(question, history, van_config)
+        if name == "ollama":
+            return _ask_llama(question, history, van_config, model=model)
         return _ask_llama(question, history, van_config)
 
     if name == "anthropic":

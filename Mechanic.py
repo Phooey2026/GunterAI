@@ -555,6 +555,8 @@ def ask_gunter(question, history=None, van_config=None):
     if not api_key:
         if LLM_MODE == "claude":
             return _ask_claude(question, history, van_config)
+        if name == "ollama":
+            return _ask_llama(question, history, van_config, model=model)
         return _ask_llama(question, history, van_config)
 
     if name == "anthropic":
