@@ -386,6 +386,9 @@ def play_ready_sound():
 
 
 def speak(text):
+    """Piper TTS → /tmp/gunter_tts.wav → afplay (replaces paplay on macOS)."""
+    if not text or not text.strip():
+        return
     # ── Strip markdown before TTS — removes **, *, ##, #, __ etc. ────────────
     import re as _re
     text = _re.sub(r'\*\*(.+?)\*\*', r'\1', text)   # **bold** → bold
@@ -609,7 +612,8 @@ def _identify_systems(question):
         "suspension":   ["bearing", "wheel bearing", "tire", "tyre", "pressure",
                          "psi", "alignment", "steering", "suspension",
                          "shock", "spring", "wobble", "vibration", "noise wheel",
-                         "front wheel", "rear wheel"],
+                         "front wheel", "rear wheel", "cv joint", "cv boot", "axle",
+                         "clicking", "clunk"],
         "electrical":   ["electrical", "wiring", "fuse", "relay", "battery",
                          "alternator", "voltage", "ground", "short circuit",
                          "gremlin", "intermittent", "light", "charging",
@@ -661,6 +665,7 @@ def _load_wiki_context(systems):
                          "brakes/fluid.md"],
         "suspension":   ["suspension/front-bearings.md",
                          "suspension/rear-bearings.md",
+                         "suspension/cv-joints.md",
                          "suspension/tires.md"],
         "electrical":   ["electrical/overview.md",
                          "electrical/charging.md"],
@@ -760,7 +765,7 @@ GUNTER:"""
         "prompt": full_prompt,
         "stream": False,
         "options": {
-            "num_predict": 300,
+            "num_predict": 1100,
             "num_ctx":     16384,
             "temperature": 0.2
         }
@@ -768,7 +773,7 @@ GUNTER:"""
     try:
         response = requests.post(
             "http://localhost:11434/api/generate",
-            json=payload, timeout=600
+            json=payload, timeout=300
         )
         return response.json().get(
             "response", "The Bentley is greasy and I cannot read it.")
